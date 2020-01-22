@@ -1,0 +1,12 @@
+<script>
+$(document).ready(function(){
+  $("input#individual-bags-and-ribboning-500").change(function() {
+    if ($(this).is(':checked')) {
+      $("<input>").attr({ name: "id[]", id: "individual-bags-and-ribboning-500-id", type: "hidden", value: 31711163121724 }).appendTo(".purchase-details");
+    }
+    else {
+      $("#individual-bags-and-ribboning-500-id").remove();
+    }
+  });
+});
+</script>
