@@ -1,0 +1,107 @@
+<div class="addons-wrap">
+  <table cellspacing="0" class="addons-products addons-table">
+    <tbody>
+      {%- for block in section.blocks -%}
+      {% assign product-add-ons = all_products[block.settings.add-ons] %}
+      <tr class="addons-product addons-product-together" data-id="{{product-add-ons.id}}" data-price="{{product-add-ons.price_min | money}}">
+        <td class="addons-choose">
+          <input id="addons-checkbox" class="addons-checkbox" type="checkbox" value="">
+        </td>
+        <td class="addons-quantity">
+          <div class="quantity">
+            <label class="screen-reader-text" for="quantity_5e821b044554f">{{product-add-ons.title}}</label>
+            <input type="number" id="quantity_5e821b044554f" class="input-text addons-qty qty text" step="1" min="0" max="1000" name="quantity" value="1" title="Aantal" size="4" placeholder="" inputmode="numeric">
+          </div>
+        </td>
+        <td class="addons-thumb">
+          <div class="addons-thumb-ori">
+            <img width="100" height="100" src="{{product-add-ons.featured_image | img_url: 'small'}}" class="add-ons-thumbnail" alt="{{product-add-ons.title}}">
+          </div>
+        </td>
+        <td class="addons-title">
+          <a href="{{product-add-ons.url}}">{{product-add-ons.title}}</a>
+        </td>
+        <td class="addons-price">
+          <div class="addons-price-ori">
+            <del><span class="addons-amount-cross money">{{product-add-ons.compare_at_price_max | money}}</span></del>
+            <ins><span class="addons-amount money">{{product-add-ons.price_min | money}}</span></ins>
+          </div>
+        </td>
+      </tr>
+      {%- endfor -%}
+    </tbody>
+  </table>
+  <div class="addons-total" style="display: block;">Total: <span class="addons-amount money">$5.97</span></div>
+</div>
+<script>
+$(document).ready(function(){ {%- for block in section.blocks -%}
+  $("input#addons-checkbox").change(function() {
+    if ($(this).is(':checked')) {
+      $("<input>").attr({ name: "id[]", id: "addons-checkbox-{{id}}", type: "hidden", value: 31711163121724 }).appendTo(".purchase-details");
+    }
+    else {
+      $("#individual-bags-and-ribboning-500-id").remove();
+    }
+  }); {%- endfor -%}
+});
+</script>
+{% schema %}
+  {
+    "name": "Section Add Ons",
+    "settings": []
+  }
+{% endschema %}
+
+<style>
+  .addons-wrap {
+    display: inline-block;
+    width: 100%;
+    margin: 20px 0 0;
+}
+  .addons-wrap .addons-table {
+    margin: 0 0 15px;
+  }
+  .screen-reader-text {
+    display: none; 
+  }
+  .addons-quantity input {
+    width: 60px;
+    height: 40px;
+    text-align: center;
+    background-color: #f2f2f2;
+    color: #43454b;
+    border: 0;
+    -webkit-appearance: none;
+    box-sizing: border-box;
+    font-weight: 400;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.125);
+    border: 1px solid #d9d9d9;
+}
+
+.addons-product > td {
+    padding: 10px 10px 10px 0;
+    background-color: transparent;
+    border-width: 0 0 1px;
+    border-style: dotted;
+    border-color: #e5e5e5;
+}
+.addons-thumb img {
+    max-width: 60px;
+    height: 60px;
+    display: block;
+}
+  .addons-title a {
+    font-size: 14px;
+}
+  .addons-price del {
+    color: #97979e;
+}
+.addons-wrap tbody tr {
+    border-bottom: 1px solid #ddd;
+}
+.addons-price ins {
+    text-decoration: blink;
+    color: #d54d4d;
+    font-weight: 600;
+}
+</style>
