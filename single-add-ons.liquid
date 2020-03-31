@@ -1,0 +1,122 @@
+{% assign show-add-ons = false %}
+{% for add-ons in product.tags %}{% if add-ons contains 'products/' %}{% assign show-add-ons = true %}{% assign pro-add-ons = add-ons | remove: 'products/' %}{% assign product-add-ons = all_products[pro-add-ons] %}{% endif %}{% endfor %}{% if show-add-ons %}
+<div class="addons-wrap">
+  <table cellspacing="0" class="addons-products addons-table">
+    <tbody>
+      <tr class="addons-product addons-product-together" data-id="{{product-add-ons.selected_or_first_available_variant.id}}" data-price="{{product-add-ons.price_min | money}}">
+        <td class="addons-choose">
+          <input id="addons-checkbox" class="addons-checkbox" type="checkbox" value="">
+        </td>
+        <td class="addons-quantity">
+          <div class="quantity">
+            <div class="ProductForm__QuantitySelector">
+              <div class="QuantitySelector QuantitySelector--large">
+                <span class="QuantitySelector__Button Link Link--secondary minues" data-action="decrease-quantity"><svg class="Icon Icon--minus" role="presentation" viewBox="0 0 16 2"><path d="M1,1 L15,1" stroke="currentColor" fill="none" fill-rule="evenodd" stroke-linecap="square"></path></svg></span>
+                <input type="text" class="QuantitySelector__CurrentQuantity" pattern="[0-9]*" name="quantity" value="1" id="qty-{{ product-add-ons.id }}">
+                <span class="QuantitySelector__Button Link Link--secondary plus" data-action="increase-quantity"><svg class="Icon Icon--plus" role="presentation" viewBox="0 0 16 16"><g stroke="currentColor" fill="none" fill-rule="evenodd" stroke-linecap="square"><path d="M8,1 L8,15"></path><path d="M1,8 L15,8"></path></g></svg></span>
+              </div>
+            </div>
+            <select data-qty="qty-{{ product-add-ons.id }}" name="disabled" class="add-ons-variants" style="display:none;">{% for variant in product-add-ons.variants %}
+                <option{% if variant == product-add-ons.selected_or_first_available_variant %} selected="selected"{% endif %} data-stock="{% if variant.available %}true{% else %}false{% endif %}" value="{{variant.id}}" data-backssize="{{variant.title | split: ' / ' | first}}">{{ variant.title }}{% if variant.available %}{% else %} - {{ 'products.product.sold_out' | t }}{% endif %}</option>{% endfor %}
+            </select>
+          </div>
+        </td>
+        <td class="addons-thumb">
+          <div class="addons-thumb-ori">
+            <img width="100" height="100" src="{{product-add-ons.featured_image | img_url: 'small'}}" class="add-ons-thumbnail" alt="{{product-add-ons.title}}">
+          </div>
+        </td>
+        <td class="addons-title">
+          <a href="{{product-add-ons.url}}">{{product-add-ons.title}}</a>
+        </td>
+        <td class="addons-price">
+          <div class="addons-price-ori">
+            <del><span class="addons-amount-cross money">{{product-add-ons.compare_at_price_max | money}}</span></del>
+            <ins><span class="addons-amount money">{{product-add-ons.price_min | money}}</span></ins>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<script type="text/javascript">
+$(document).ready(function() {
+  $("#addons-checkbox").change(function() {
+    if ($(this).is(':checked')) {
+     $(this).attr('checked', true).parents('.addons-product').find('select').attr('name', 'id');
+    }else {
+      $(this).attr('checked', false).parents('.addons-product').find('select').attr('name', 'disabled');
+    }
+    var length = $(".Product__Info select[name=id]").length;
+    console.log(length);
+  });
+  var length = $(".Product__Info select[name=id]").length;
+   $(document).on('click', '.Product__Info .ProductForm__AddToCart', function(e) {
+    e.preventDefault();
+    var productlist = new Array();
+    $('.Product__Info select[name=id]').each(function (index, element) {
+       var id = $(this).find('option:selected').val();
+       var qt = $('#'+$(this).data('qty')).val();
+       productlist.push({ variant_id: id, variant_qt: qt || 0 });
+    });
+    function ajaxProduct(id){
+      if (productlist.length) {
+        var request = productlist.shift();
+        var tempId= request.variant_id;
+        var tempqt= request.variant_qt;
+        var params = {
+          type: 'POST',
+          url: '/cart/add.js',
+          data: 'quantity='+tempqt+'&id='+tempId,
+          dataType: 'json',
+          success: function(data) { ajaxProduct(); console.log(tempId+' / '+tempqt) },
+          error: function() { ajaxProduct(); }
+        };
+        $.ajax(params);
+      }
+      else {
+        document.location.href = '/cart';
+      }
+    };
+    ajaxProduct();
+   });
+});
+</script>
+{% endif %}
+<style>
+  .addons-wrap {
+    display: inline-block;
+    width: 100%;
+    margin: 20px 0 0;
+  }
+  .addons-wrap .addons-table {
+    margin: 0 0 15px;
+  }
+
+.addons-product > td {
+    padding: 10px 10px 10px 0;
+    background-color: transparent;
+    border-width: 0 0 1px;
+    border-style: dotted;
+    border-color: #e5e5e5;
+}
+.addons-thumb img {
+    max-width: 60px;
+    height: 60px;
+    display: block;
+}
+  .addons-title a {
+    font-size: 14px;
+}
+  .addons-price del {
+    color: #97979e;
+}
+.addons-wrap tbody tr {
+    border-bottom: 1px solid #ddd;
+}
+.addons-price ins {
+    text-decoration: blink;
+    color: #d54d4d;
+    font-weight: 600;
+}
+</style>
